@@ -7,7 +7,7 @@ import random
 now = datetime.now
 
 class Client(threading.Thread):
-    message_count = 1
+    message_count = 0
     name = ""
     peer_name = ""
     peer_ip = ""
@@ -36,7 +36,7 @@ class Client(threading.Thread):
 
 
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client.bind(('0.0.0.0', int(self.peer_port) + 7))
+        self.client.bind(('0.0.0.0', int(self.peer_port) + 5))
         self.client.listen()
 
         conn, addr = self.client.accept()
@@ -49,8 +49,9 @@ class Client(threading.Thread):
     
     def send_to_client(self):
         msg = input("Insira sua mensagem: ")
-        self.message_count += 1
         date = datetime.now().strftime("%d/%m/%Y %H:%M")
+        self.message_count += 1
+
 
         self.new_sock.sendall(bytes((f"{self.name} ({date}) #{self.message_count}:  {msg}\n"), 'utf-8'))
 
@@ -68,15 +69,16 @@ class Client(threading.Thread):
 
                 thread3.start()
             else:
+                self.message_count += 1
+
                 chunks = rcvd.split(" ")
                 print(f'{self.name} #{self.message_count} (enviado {chunks[1].removeprefix("(")} {chunks[2]}{rcvd[27:]}')
                 self.new_sock.send('Confirmacao'.encode('utf-8'))
 
-                self.message_count += 1
-
                 thread2 = threading.Thread(target=self.send_to_client)
 
                 thread2.start()
+
 
 
 
